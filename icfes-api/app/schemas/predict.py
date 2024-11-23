@@ -1,31 +1,22 @@
-from typing import Any, List, Optional
-from pydantic import BaseModel
+from fastapi import APIRouter
+from app.schemas import PredictionResults, MultipleDataInputs
 
-# Esquema para los resultados de predicción
-class PredictionResults(BaseModel):
-    errors: Optional[Any]
-    version: str
-    predictions: Optional[List[float]]  # Lista de predicciones numéricas (PUNT_GLOBAL)
+api_router = APIRouter()
 
-# Esquema para los inputs múltiples
-class MultipleDataInputs(BaseModel):
-    inputs: List[dict]  # Lista de diccionarios con los datos de entrada
+# Ruta de salud
+@api_router.get("/health", response_model=PredictionResults, status_code=200)
+def health():
+    return {"status": "ok"}
 
-    class Config:
-        schema_extra = {
-            "example": {
-                "inputs": [
-                    {
-                        "FAMI_ESTRATOVIVIENDA": 3,
-                        "FAMI_PERSONASHOGAR": 4,
-                        "FAMI_TIENEINTERNET": 1,
-                        "ESTU_HORASSEMANATRABAJA": 10,
-                        "FAMI_COMECARNEPESCADOHUEVO": 2,
-                        "COLE_NATURALEZA": "Privado",
-                        "ESTU_DEPTO_RESIDE": "Bogotá",
-                        "COLE_JORNADA": "Mañana",
-                        "COLE_GENERO": "Mixto",
-                    }
-                ]
-            }
-        }
+# Ruta de predicción temporal (sin modelo)
+@api_router.post("/predict", response_model=PredictionResults, status_code=200)
+async def predict(input_data: MultipleDataInputs):
+    """
+    Ruta temporal para verificar que la API funciona sin el modelo.
+    """
+    # Simulación de respuesta
+    return {
+        "errors": None,
+        "version": "1.0.0",
+        "predictions": [0.0 for _ in input_data.inputs]  # Devuelve una lista de ceros
+    }
